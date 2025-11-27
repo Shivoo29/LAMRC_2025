@@ -36,11 +36,11 @@
 bool isBlackLine = true;     // true for black line on white background
 unsigned int numSensors = 8;
 
-// Speed Settings - START CONSERVATIVE
-int baseSpeed = 100;         // Base speed for line following
-int maxSpeed = 150;          // Maximum speed on straights
-int turnSpeed = 80;          // Speed for sharp turns
-int currentSpeed = 80;       // Start slow, ramp up
+// Speed Settings - INCREASED FOR BETTER MOVEMENT
+int baseSpeed = 140;         // Base speed for line following
+int maxSpeed = 200;          // Maximum speed on straights
+int turnSpeed = 120;         // Speed for sharp turns
+int currentSpeed = 120;      // Start at decent speed
 
 // PID Tuning - OPTIMIZED FOR THICK LINES
 float Kp = 0.015;    // Reduced for thick lines (less aggressive)

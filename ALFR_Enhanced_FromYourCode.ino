@@ -30,8 +30,8 @@ unsigned int numSensors = 8;
 int P, D, I, previousError, PIDvalue;
 double error;
 int lsp, rsp;
-int lfSpeed = 140;           // Increased max speed slightly
-int currentSpeed = 90;        // Start a bit faster
+int lfSpeed = 180;           // Increased max speed
+int currentSpeed = 120;       // Start faster to overcome friction
 int sensorWeight[8] = { -8, -4, -2, -1, 1, 2, 4, 8 };
 
 int activeSensors;
@@ -91,9 +91,12 @@ void setup() {
   Serial.print(F(" Kd=")); Serial.print(Kd);
   Serial.print(F(" Ki=")); Serial.println(Ki);
   Serial.println();
-  Serial.println(F("Press Pin 11 to calibrate A6-A7"));
-  Serial.println(F("Press Pin 12 to START"));
-  Serial.println(F("Or send 'C' to calibrate, 'G' to go"));
+  Serial.println(F("*** IMPORTANT: HOW TO START ***"));
+  Serial.println(F("Option 1: Press Pin 12 button"));
+  Serial.println(F("Option 2: Open Serial Monitor and send 'G'"));
+  Serial.println(F(""));
+  Serial.println(F("To calibrate sensors: Pin 11 or send 'C'"));
+  Serial.println(F("To stop while running: send 'S'"));
   Serial.println(F("======================\n"));
 }
 
