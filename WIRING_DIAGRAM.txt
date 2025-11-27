@@ -1,0 +1,400 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    ALFR WIRING DIAGRAM - LAM RESEARCH 2025                     ║
+║                           Thick Line Follower Robot                            ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════
+                            COMPONENT OVERVIEW
+═══════════════════════════════════════════════════════════════════════════════
+
+  ┌─────────────────┐      ┌──────────────┐      ┌─────────────┐
+  │  RLS-08 Sensor  │      │ Arduino Nano │      │   L298N     │
+  │     Array       │─────▶│     R3       │─────▶│   Motor     │
+  │   (8 sensors)   │      │  (CH340)     │      │   Driver    │
+  └─────────────────┘      └──────────────┘      └─────────────┘
+         ▲                        ▲                      ▲
+         │                        │                      │
+         └────────── 5V Power ────┴──────────────────────┘
+                                  │
+                           ┌──────┴──────┐
+                           │   Battery   │
+                           │  11.1-12V   │
+                           └─────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                        DETAILED PIN CONNECTIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  1. RLS-08 SENSOR ARRAY → ARDUINO NANO                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    RLS-08 Sensor Array              Arduino Nano R3
+    ┌─────────────────┐              ┌──────────────┐
+    │                 │              │              │
+    │  OUT1 (S1) ─────┼──────────────▶ A0          │ Leftmost Sensor
+    │  OUT2 (S2) ─────┼──────────────▶ A1          │
+    │  OUT3 (S3) ─────┼──────────────▶ A2          │
+    │  OUT4 (S4) ─────┼──────────────▶ A3          │ Center-Left
+    │  OUT5 (S5) ─────┼──────────────▶ A4          │ Center-Right
+    │  OUT6 (S6) ─────┼──────────────▶ A5          │
+    │  OUT7 (S7) ─────┼──────────────▶ A6          │
+    │  OUT8 (S8) ─────┼──────────────▶ A7          │ Rightmost Sensor
+    │                 │              │              │
+    │  VCC ───────────┼──────────────▶ 5V          │
+    │  GND ───────────┼──────────────▶ GND         │
+    │                 │              │              │
+    └─────────────────┘              └──────────────┘
+
+    IMPORTANT: Verify sensor numbering on YOUR RLS-08 board!
+               Some boards have sensors numbered in reverse order.
+
+    SENSOR LAYOUT ON ROBOT (Top View):
+    ╔════════════════════════════════════════════════════╗
+    ║  FRONT OF ROBOT                                    ║
+    ║                                                    ║
+    ║    [S1] [S2] [S3] [S4] [S5] [S6] [S7] [S8]        ║
+    ║     ↓    ↓    ↓    ↓    ↓    ↓    ↓    ↓         ║
+    ║    ═══════════════════════════════════════        ║
+    ║              Black Line Track                     ║
+    ╚════════════════════════════════════════════════════╝
+    LEFT ←                                    → RIGHT
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  2. ARDUINO NANO → L298N MOTOR DRIVER                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Arduino Nano R3                  L298N Motor Driver
+    ┌──────────────┐                ┌──────────────────┐
+    │              │                │                  │
+    │  D5  (PWM) ──┼────────────────▶ ENA (Left PWM)  │
+    │  D6 ─────────┼────────────────▶ IN1 (Left Dir1) │
+    │  D7 ─────────┼────────────────▶ IN2 (Left Dir2) │
+    │              │                │                  │
+    │  D9  (PWM) ──┼────────────────▶ ENB (Right PWM) │
+    │  D10 ────────┼────────────────▶ IN3 (Right Dir1)│
+    │  D11 ────────┼────────────────▶ IN4 (Right Dir2)│
+    │              │                │                  │
+    │  GND ────────┼────────────────▶ GND             │
+    │              │                │                  │
+    └──────────────┘                └──────────────────┘
+
+    NOTE: ENA and ENB jumpers on L298N should be REMOVED if using PWM control
+          (They are usually pre-installed - remove them!)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  3. L298N MOTOR DRIVER → MOTORS & POWER                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                                L298N Motor Driver
+                               ┌──────────────────┐
+                               │                  │
+    Left Motor                 │  OUT1 ───────────┼──┐
+    N20 600RPM    ┌────────────┼─ OUT2            │  │
+    12V           │            │                  │  │
+        ┌─────────┴──┐         │  OUT3 ───────────┼──┤ Right Motor
+        │  M1     M1 │         │  OUT4            │  │ N20 600RPM
+        │   -      + │         │                  │  │ 12V
+        └────────────┘         └──────────────────┘  │
+                                                      │
+                                                 ┌────┴──────┐
+                                                 │  M2    M2 │
+                                                 │   -     + │
+                                                 └───────────┘
+
+    Battery Power:
+    ┌─────────────┐
+    │   Battery   │              L298N Motor Driver
+    │  11.1-12V   │             ┌──────────────────┐
+    │             │             │                  │
+    │   (+) ──────┼─────────────▶ +12V (or VIN)   │
+    │   (-) ──────┼─────────────▶ GND             │
+    │             │             │                  │
+    └─────────────┘             │  +5V (output) ───┼──┐
+                                │                  │  │ (Optional)
+                                └──────────────────┘  │
+                                                      │
+                                Arduino Nano          │
+                               ┌──────────────┐       │
+                               │  VIN ◀───────┼───────┘
+                               │              │
+                               └──────────────┘
+
+    POWER NOTES:
+    • Battery: 3S LiPo (11.1V) or 3-cell 18650 (11.1-12V)
+    • L298N can output 5V to power Arduino (if 5V regulator enabled)
+    • Alternative: Use separate buck converter for Arduino power
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  4. OPTIONAL: CALIBRATION BUTTON                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Push Button                  Arduino Nano
+    ┌─────────┐                 ┌──────────────┐
+    │         │                 │              │
+    │    ┌────┼─────────────────▶ D2          │
+    │   ╱     │                 │  (INPUT)    │
+    │  ╱      │                 │              │
+    │ O       │                 │              │
+    │         │                 │              │
+    │    └────┼─────────────────▶ GND         │
+    │         │                 │              │
+    └─────────┘                 └──────────────┘
+
+    NOTE: Arduino internal pull-up resistor is enabled in code.
+          Just connect button between D2 and GND.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        COMPLETE SYSTEM DIAGRAM
+═══════════════════════════════════════════════════════════════════════════════
+
+                            ┌─────────────────────┐
+                            │   12V BATTERY       │
+                            │   (11.1-12.6V)      │
+                            └──────┬─────┬────────┘
+                                   │     │
+                                  +12V  GND
+                                   │     │
+                    ┌──────────────┴─────┴──────────────┐
+                    │     L298N MOTOR DRIVER            │
+                    │                                   │
+                    │   ENA ENB IN1 IN2 IN3 IN4        │
+                    │    │   │   │   │   │   │         │
+                    │   OUT1 OUT2  OUT3 OUT4  +5V GND  │
+                    └────┬───┬─────┬───┬───┬────┬──────┘
+                         │   │     │   │   │    │
+                    Motor1  Motor2 │   │   │    │
+                      (L)    (R)   │   │   │    │
+                                   │   │   │    │
+                    ┌──────────────┴───┴───┴────┴──────────────┐
+                    │         ARDUINO NANO R3                  │
+                    │                                           │
+                    │  D5  D6  D7    D9  D10 D11    VIN  GND   │
+                    │                                   │   │   │
+                    │  A0 A1 A2 A3 A4 A5 A6 A7   5V GND        │
+                    └───┬──┬──┬──┬──┬──┬──┬──┬───┬──┬──────────┘
+                        │  │  │  │  │  │  │  │   │  │
+                        │  │  │  │  │  │  │  │   │  │
+                    ┌───┴──┴──┴──┴──┴──┴──┴──┴───┴──┴──────────┐
+                    │      RLS-08 LINE SENSOR ARRAY            │
+                    │                                           │
+                    │  S1 S2 S3 S4 S5 S6 S7 S8       VCC GND   │
+                    │   │  │  │  │  │  │  │  │                │
+                    │   ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼                │
+                    └───────────────────────────────────────────┘
+                               (Sensors facing down)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        POWER DISTRIBUTION DIAGRAM
+═══════════════════════════════════════════════════════════════════════════════
+
+                         ┌─────────────────┐
+                         │  BATTERY 12V    │
+                         │  (3S LiPo or    │
+                         │   3x18650)      │
+                         └────┬──────┬─────┘
+                              │      │
+                             +12V   GND
+                              │      │
+                              │      │
+              ┌───────────────┴──────┴─────────────┐
+              │                                    │
+              │                                    │
+         ┌────▼─────┐                    ┌─────────▼────────┐
+         │  L298N   │                    │   (Optional)     │
+         │  Motor   │                    │   Buck Converter │
+         │  Driver  │                    │   12V → 5V       │
+         │          │                    │                  │
+         │  Motors  │                    │      5V          │
+         │  +5V Out │                    └──────┬───────────┘
+         └────┬─────┘                           │
+              │                                 │
+              │ (Optional Path)                 │ (Recommended)
+              │                                 │
+         ┌────▼────────────────────────────┐    │
+         │       ARDUINO NANO              │    │
+         │         VIN  ◄──────────────────┴────┘
+         │         5V   ────────┐          │
+         │         GND  ────┐   │          │
+         └──────────────────┼───┼──────────┘
+                            │   │
+                     ┌──────┴───┴──────┐
+                     │   RLS-08 Sensor │
+                     │   GND    VCC    │
+                     └─────────────────┘
+
+    POWER OPTIONS:
+
+    Option A (Simple):
+    Battery → L298N → L298N 5V output → Arduino VIN → Sensors
+    • Easy to wire
+    • L298N regulator may heat up
+    • Remove 5V jumper on L298N if motors draw high current
+
+    Option B (Recommended):
+    Battery → L298N (for motors)
+    Battery → Buck Converter → Arduino VIN → Sensors
+    • More reliable
+    • Better voltage regulation
+    • No heating issues
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                            WIRE COLOR CODING
+═══════════════════════════════════════════════════════════════════════════════
+
+    RECOMMENDED COLORS (for easy debugging):
+
+    RED    = Power (+12V, +5V, VCC)
+    BLACK  = Ground (GND, -)
+    YELLOW = PWM signals (ENA, ENB, D5, D9)
+    BLUE   = Direction signals (IN1-4, D6, D7, D10, D11)
+    GREEN  = Sensor signals (A0-A7)
+    WHITE  = Control signals (buttons, etc)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        ASSEMBLY CHECKLIST
+═══════════════════════════════════════════════════════════════════════════════
+
+    BEFORE POWERING ON:
+
+    □ Battery is charged (check voltage: should be >11V)
+    □ All GND connections are secure (common ground is critical!)
+    □ Motor wires are properly connected to L298N
+    □ Arduino is powered separately OR via L298N 5V output
+    □ Sensor array VCC connected to Arduino 5V
+    □ Sensor array GND connected to Arduino GND
+    □ All 8 sensor outputs connected to A0-A7
+    □ Motor control pins (D5,D6,D7,D9,D10,D11) connected to L298N
+    □ ENA/ENB jumpers REMOVED from L298N (if using PWM)
+    □ No short circuits between +12V and GND
+    □ Wires are secured (use zip ties or hot glue)
+    □ Code is uploaded to Arduino
+
+    INITIAL POWER-ON TEST:
+
+    □ Connect battery
+    □ Arduino LED should turn on
+    □ No smoke, no hot components
+    □ Connect USB to computer
+    □ Open Serial Monitor (115200 baud)
+    □ Should see startup message
+    □ Send 'V' command to check sensor readings
+    □ Manually spin motors to verify connections
+    □ Perform calibration
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        TROUBLESHOOTING WIRING
+═══════════════════════════════════════════════════════════════════════════════
+
+    PROBLEM: Motors don't run
+    CHECK:
+    • Battery voltage (use multimeter)
+    • L298N power LED on?
+    • Arduino receiving commands?
+    • Motor wires connected to OUT1-4?
+    • Control pins IN1-4 receiving signals?
+
+    PROBLEM: Motors run backwards
+    FIX:
+    • Swap motor wires on L298N terminal
+    • OR change code motor direction logic
+
+    PROBLEM: Sensors show all 0 or all 1023
+    CHECK:
+    • Sensor VCC connected to 5V?
+    • Sensor GND connected?
+    • Sensor outputs connected to A0-A7?
+    • Sensors at correct height (3-8mm)?
+
+    PROBLEM: Arduino won't power on
+    CHECK:
+    • Battery voltage >11V?
+    • VIN connection to Arduino?
+    • GND connection to Arduino?
+    • Buck converter working (if used)?
+    • USB cable connected for programming?
+
+    PROBLEM: Erratic behavior
+    CHECK:
+    • Common ground between all components?
+    • Loose connections (wiggle wires)?
+    • Battery voltage under load?
+    • EMI from motors (add capacitors)?
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        MOTOR WIRING VERIFICATION
+═══════════════════════════════════════════════════════════════════════════════
+
+    To verify motor connections are correct:
+
+    1. Upload code to Arduino
+    2. Place robot on elevated surface (wheels off ground)
+    3. Power on
+    4. Watch Serial Monitor debug output:
+
+       When Error is NEGATIVE (line on LEFT):
+       • Left motor should run SLOWER
+       • Right motor should run FASTER
+       → Robot should turn LEFT
+
+       When Error is POSITIVE (line on RIGHT):
+       • Left motor should run FASTER
+       • Right motor should run SLOWER
+       → Robot should turn RIGHT
+
+    5. If motors turn in WRONG direction:
+       • Swap wires for that motor on L298N
+       • OR modify code (see setup guide)
+
+    6. If motors turn in OPPOSITE direction:
+       • Both are reversed
+       • Swap wires for BOTH motors
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        WIRING TIPS & BEST PRACTICES
+═══════════════════════════════════════════════════════════════════════════════
+
+    ✓ Use solid-core wire for breadboard prototyping
+    ✓ Use stranded wire for final robot assembly (more flexible)
+    ✓ Solder all critical connections (don't rely on jumpers)
+    ✓ Use heat shrink tubing on solder joints
+    ✓ Bundle wires with zip ties for clean look
+    ✓ Label wires with tape for easy debugging
+    ✓ Use connectors (JST, Dupont) for easy disassembly
+    ✓ Add 0.1µF capacitors across motor terminals (reduce EMI)
+    ✓ Secure heavy components (battery, motor driver)
+    ✓ Keep sensor array wires short to reduce noise
+    ✓ Test continuity with multimeter before powering on
+    ✓ Double-check all connections against this diagram
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                            SAFETY WARNINGS
+═══════════════════════════════════════════════════════════════════════════════
+
+    ⚠️  NEVER reverse battery polarity - will damage components!
+    ⚠️  NEVER connect 12V directly to Arduino or sensors!
+    ⚠️  NEVER short battery terminals together!
+    ⚠️  ALWAYS use fuse on battery positive wire (recommended)
+    ⚠️  ALWAYS ensure common ground between all components
+    ⚠️  ALWAYS test with low battery voltage first (9V)
+    ⚠️  ALWAYS have fire extinguisher nearby when testing LiPo
+    ⚠️  NEVER leave charging battery unattended
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+    For detailed setup instructions, see: ALFR_SETUP_GUIDE.md
+    For debugging help, see: DEBUG_QUICK_REFERENCE.md
+
+═══════════════════════════════════════════════════════════════════════════════
